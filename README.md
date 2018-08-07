@@ -1,3 +1,11 @@
+This is a fork of the official Amazon Advertising API PHP SDK. [amzn/amazon-advertising-api-php-sdk](https://github.com/amzn/amazon-advertising-api-php-sdk)
+
+## Additions
+
+Added the following optional config params:
+- ```curloptTimeout``` with default value of ```3600``` seconds to complete operation
+- ```curloptConnectTimeout``` with default value of ```0``` which will wait indefinitely while connection is made
+
 ## Synopsis
 
 Official Amazon Advertising API PHP client library.

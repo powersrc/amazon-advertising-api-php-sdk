@@ -1,0 +1,33 @@
+# Composer
+composer.phar
+/vendor
+
+# PhpStorm
+# Covers JetBrains IDEs
+.idea/
+*.ipr
+*.iws
+.idea_modules/
+atlassian-ide-plugin.xml
+com_crashlytics_export_strings.xml
+*.php~
+.phpstorm.meta.php
+
+# Sublime
+*.sublime-workspace
+*.sublime-project
+
+# Visual Studio
+/.vs
+
+# Visual Studio Code
+/.vscode
+
+# Testing
+/coverage
+
+# Linting
+.php_cs.cache
+
+/*.cache
+/.vagrant

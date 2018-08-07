@@ -13,7 +13,10 @@ class Client
         "region" => null,
         "accessToken" => null,
         "refreshToken" => null,
-        "sandbox" => false);
+        "sandbox" => false,
+        "curloptTimeout" => 3600, // 1 hour to complete operation
+        "curloptConnectTimeout" => 0 // Wait indefinitely to make connection
+    );
 
     private $apiVersion = null;
     private $applicationVersion = null;
@@ -478,6 +481,9 @@ class Client
 
     protected function _executeRequest($request)
     {
+        $request->setOption(CURLOPT_TIMEOUT, $this->config["curloptTimeout"]);
+        $request->setOption(CURLOPT_CONNECTTIMEOUT, $this->config["curloptConnectTimeout"]);
+
         $response = $request->execute();
         $this->requestId = $request->requestId;
         $response_info = $request->getInfo();
@@ -489,17 +495,15 @@ class Client
         }
 
         if (!preg_match("/^(2|3)\d{2}$/", $response_info["http_code"])) {
-            $requestId = 0;
+            $errorRequestId = 0;
             $json = json_decode($response, true);
-            if (!is_null($json)) {
-                if (array_key_exists("requestId", $json)) {
-                    $requestId = json_decode($response, true)["requestId"];
-                }
+            if (!is_null($json) && array_key_exists("requestId", $json)) {
+                $errorRequestId = $json["requestId"];
             }
             return array("success" => false,
                     "code" => $response_info["http_code"],
                     "response" => $response,
-                    "requestId" => $requestId);
+                    "requestId" => $errorRequestId);
         } else {
             return array("success" => true,
                     "code" => $response_info["http_code"],
@@ -542,22 +546,28 @@ class Client
                     }
                     break;
                 case "accessToken":
-                    if (!is_null($v)) {
-                        if (!preg_match("/^Atza(\||%7C|%7c).*$/", $v)) {
-                            $this->_logAndThrow("Invalid parameter value for accessToken.");
-                        }
+                    if (!is_null($v) && !preg_match("/^Atza(\||%7C|%7c).*$/", $v)) {
+                        $this->_logAndThrow("Invalid parameter value for accessToken.");
                     }
                     break;
                 case "refreshToken":
-                    if (!is_null($v)) {
-                        if (!preg_match("/^Atzr(\||%7C|%7c).*$/", $v)) {
-                            $this->_logAndThrow("Invalid parameter value for refreshToken.");
-                        }
+                    if (!is_null($v) && !preg_match("/^Atzr(\||%7C|%7c).*$/", $v)) {
+                        $this->_logAndThrow("Invalid parameter value for refreshToken.");
                     }
                     break;
                 case "sandbox":
                     if (!is_bool($v)) {
                         $this->_logAndThrow("Invalid parameter value for sandbox.");
+                    }
+                    break;
+                case "curloptTimeout":
+                    if (!is_int($v)) {
+                        $this->_logAndThrow("Invalid parameter value for curloptTimeout.");
+                    }
+                    break;
+                case "curloptConnectTimeout":
+                    if (!is_int($v)) {
+                        $this->_logAndThrow("Invalid parameter value for curloptConnectTimeout.");
                     }
                     break;
             }
